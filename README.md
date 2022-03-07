@@ -1,2 +1,2 @@
 # NASA-Turbofan-Engine-Predictive-Maintenance
-Predictive Maintenance project using Python and based on C-MAPSS NASA Turbofan Engine data.
+Predictive Maintenance project using Python and C-MAPSS NASA Turbofan Engine data.
