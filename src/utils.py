@@ -40,3 +40,15 @@ def load_data(dataprefix1: str,
             print('Number of rows : %s ' % str(shape[0]))
             print('Number of columns : %s ' % str(shape[1]))
     return dataframes
+
+
+def extract_rul(dataframes):
+    for i in range(1, 5):
+        dataframes[f'train_FD00{i}']['RUL'] = dataframes[f'train_FD00{i}'].groupby('Engine_no')['Time'].transform(
+            'max') - dataframes[f'train_FD00{i}']['Time']
+        dataframes[f'RUL_FD00{i}']['Engine_no'] = dataframes[f'RUL_FD00{i}'].index + 1
+        dataframes[f'test_FD00{i}'] = dataframes[f'test_FD00{i}'].merge(dataframes[f'RUL_FD00{i}'], how='inner',
+                                                                        on='Engine_no')
+        dataframes[f'test_FD00{i}']['RUL'] += dataframes[f'test_FD00{i}'].groupby('Engine_no')['Time'].transform(
+            'max') - dataframes[f'test_FD00{i}']['Time']
+    return dataframes
