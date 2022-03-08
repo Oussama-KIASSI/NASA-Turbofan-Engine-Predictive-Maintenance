@@ -1,9 +1,8 @@
-### Example user template template
-### Example user template
-
 # IntelliJ project files
 .idea
-*.iml
-out
-gen
+# Virtual environment
 venv
+# Notebooks cache
+notebooks/.ipynb_checkpoints
+# Python cache
+src/__pycache__
