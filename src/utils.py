@@ -1,8 +1,9 @@
-import pandas as _pd
 import os as _os
-import re as _re
-import tqdm.notebook as _tqdm
 import pickle as _pkl
+import re as _re
+
+import pandas as _pd
+import tqdm.notebook as _tqdm
 
 
 def load_data(data_prefix_1: str,
@@ -47,6 +48,7 @@ def load_data(data_prefix_1: str,
             print('\n' + '-' * 30 + '\n' + file_name.center(30, '-') + '\n' + '-' * 30)
             print('Number of rows : %s ' % str(df_shape[0]))
             print('Number of columns : %s ' % str(df_shape[1]))
+            print('-' * 30 + '\n' + dataframes[file_name].dtypes.to_string())
     return dataframes
 
 
@@ -136,70 +138,3 @@ def load_model(model_store_path: str = '../models/01_baseline',
     # read model as binary object
     with open(file_path, 'rb') as f:
         return _pkl.load(f)
-
-
-def missing_values_table(dataframes: dict[str, _pd.DataFrame]) -> dict[str, _pd.DataFrame]:
-    """give info about missing data
-
-    Args:
-        dataframes: dictionary of dataframes
-
-    Returns:
-        dictionary of dataframes containing info about missing data in input dataframes
-    """
-    # initiate returned variable
-    missing_info_dataframes = {}
-    # iterate over dataframes
-    for k in _tqdm.tqdm(dataframes):
-        # shape of dataframe
-        df_shape = dataframes[k].shape
-        # count missing values in dataframe
-        mis_val = dataframes[k].isnull().sum()
-        # count percentage of missing values in dataframe
-        mis_val_percent = 100 * dataframes[k].isnull().sum() / df_shape[0]
-        # concatenate count and percentage
-        mis_val_table = _pd.concat([mis_val, mis_val_percent], axis=1)
-        # rename columns
-        mis_val_table_ren_columns = mis_val_table.rename(
-            columns={0: 'Missing Values', 1: '% of Total Values'})
-        # keep only columns with missing values and sort using percentage
-        mis_val_table_ren_columns = mis_val_table_ren_columns[mis_val_table_ren_columns.iloc[:, 1] != 0].sort_values(
-            '% of Total Values', ascending=False).round(2)
-        # print recap message concerning missing values
-        print(k + ' has ' + str(df_shape[1]) + ' columns.\n There are ' + str(mis_val_table_ren_columns.shape[0]) +
-              ' columns that have missing values.')
-        # add missing data info into dictionary
-        missing_info_dataframes[k] = mis_val_table_ren_columns
-    return missing_info_dataframes
-
-
-def extract_rul(dataframes: dict[str, _pd.DataFrame]) -> dict[str, _pd.DataFrame]:
-    """extract remaining useful lifetime (RUL) from dataset
-
-    Args:
-        dataframes: dictionary containing dataframes
-
-    Returns:
-        updated dictionary
-    """
-    # iterate over four sets
-    for i in _tqdm.tqdm(range(1, 5)):
-        # training data
-        # since training data is about operation till failure, inverse time to get RUL. Differently
-        # put, subtract time unit from maximum
-        dataframes[f'train_FD00{i}']['RUL'] = dataframes[f'train_FD00{i}'].groupby('Engine_no')['Time'].transform(
-            'max') - dataframes[f'train_FD00{i}']['Time']
-        # test data
-        # since RUL data is about RUL of each engine in each set, the last time unit should represent the
-        # RUL from the RUL dataset.
-        # extract Engine_no
-        dataframes[f'RUL_FD00{i}']['Engine_no'] = dataframes[f'RUL_FD00{i}'].index + 1
-        # merge test dataset with new RUL dataset
-        dataframes[f'test_FD00{i}'] = dataframes[f'test_FD00{i}'].merge(dataframes[f'RUL_FD00{i}'], how='inner',
-                                                                        on='Engine_no')
-        # subtract time unit from maximum time plus RUL of last time unit
-        dataframes[f'test_FD00{i}']['RUL'] += dataframes[f'test_FD00{i}'].groupby('Engine_no')['Time'].transform(
-            'max') - dataframes[f'test_FD00{i}']['Time']
-        # remove RUL dataframe since it will not be used after
-        del dataframes[f'RUL_FD00{i}']
-    return dataframes
