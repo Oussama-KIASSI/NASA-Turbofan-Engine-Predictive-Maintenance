@@ -41,6 +41,14 @@ def missing_values(dataframes: dict[str, _pd.DataFrame]) -> dict[str, _pd.DataFr
 
 
 def duplicate_rows(dataframes: dict[str, _pd.DataFrame]) -> dict[str, _pd.DataFrame]:
+    """give info about duplicated rows
+
+    Args:
+        dataframes: dictionary of dataframes
+
+    Returns:
+        dictionary of dataframes containing info about duplicated rows in input dataframes
+    """
     # initiate returned variable
     duplicate_rows_dataframes = {}
     # iterate over dataframes

@@ -6,9 +6,9 @@ import pandas as _pd
 import tqdm.notebook as _tqdm
 
 
-def load_data(data_prefix_1: str,
-              data_schema_1: list[str],
-              data_schema_2: list[str],
+def load_data(data_prefix: str,
+              data_schema: list[str],
+              data_schema_: list[str],
               source_path: str = '../data',
               data_type: str = '01_raw',
               data_ext: str = '.txt',
@@ -16,9 +16,9 @@ def load_data(data_prefix_1: str,
     """load data from specified path into dataframes
 
     Args:
-        data_prefix_1: first type dataset prefix
-        data_schema_1: first type dataset schema
-        data_schema_2: other type dataset schema
+        data_prefix: first type dataset prefix
+        data_schema: first type dataset schema
+        data_schema_: other type dataset schema
         source_path: data source parent folder
         data_type: data source child folder
         data_ext: data extension
@@ -38,11 +38,11 @@ def load_data(data_prefix_1: str,
             file_path = _os.path.join(data_path, file)
             file_name = _re.sub(data_ext, '', file)
             # load first type dataset
-            if file.startswith(data_prefix_1):
-                dataframes[file_name] = _pd.read_csv(file_path, sep=sep, names=data_schema_1, usecols=data_schema_1)
+            if file.startswith(data_prefix):
+                dataframes[file_name] = _pd.read_csv(file_path, sep=sep, names=data_schema, usecols=data_schema)
             # load other type dataset
             else:
-                dataframes[file_name] = _pd.read_csv(file_path, sep=sep, names=data_schema_2, usecols=data_schema_2)
+                dataframes[file_name] = _pd.read_csv(file_path, sep=sep, names=data_schema_, usecols=data_schema_)
             df_shape = dataframes[file_name].shape
             # info about loaded dataset
             print('\n' + '-' * 30 + '\n' + file_name.center(30, '-') + '\n' + '-' * 30)
