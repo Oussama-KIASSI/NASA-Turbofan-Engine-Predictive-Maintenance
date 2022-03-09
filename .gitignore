@@ -6,4 +6,5 @@ venv
 notebooks/.ipynb_checkpoints
 # Python cache
 src/__pycache__
+/notebooks/.ipynb_checkpoints/
 !/notebooks/.ipynb_checkpoints/
