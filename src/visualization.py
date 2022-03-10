@@ -80,21 +80,25 @@ def correlation_heatmap(dataframe: _pd.DataFrame,
         indicators: indicators to analyze
     """
     # add RUL columns to indicators to compute correlation
-    indicators.append('RUL')
+    indicators_ = indicators + ['RUL']
     # compute correlation of specified columns and RUL
-    corr_matrix = dataframe.loc[:, indicators].corr()
+    corr_matrix = dataframe.loc[:, indicators_].corr()
     # create mask to show only lower half of heatmap
     mask = _np.zeros_like(corr_matrix)
     mask[_np.triu_indices_from(mask, 1)] = 1
     # plot heatmap of correlation
     _plt.figure(figsize=(15, 15))
     _sns.heatmap(corr_matrix, vmax=.8, annot=True, mask=mask, cmap="coolwarm", square=False)
+    _plt.show()
     # print textual analysis
-    print('\nCorrelation insights')
-    for i, ind in enumerate(indicators):
+    # iterate over correlation matrix columns
+    for i, ind in enumerate(indicators_):
+        # iterate over elements from lower triangle in the heatmap
         for j in range(i):
+            # correlation value
             corr_ij = corr_matrix.iloc[i, j]
+            # print interpretation
             if corr_ij > .8:
-                print(f'* {ind} is strongly positively correlated with {indicators[j]} = %.2f' % corr_ij)
+                print(f'• {ind} is strongly positively correlated with {indicators_[j]} = %.2f' % corr_ij)
             elif corr_ij < -.8:
-                print(f'* {ind} is strongly negatively correlated with {indicators[j]} = %.2f' % corr_ij)
+                print(f'• {ind} is strongly negatively correlated with {indicators_[j]} = %.2f' % corr_ij)
