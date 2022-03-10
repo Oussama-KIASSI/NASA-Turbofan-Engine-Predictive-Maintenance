@@ -1,6 +1,7 @@
 import matplotlib.pyplot as _plt
 import seaborn as _sns
 import pandas as _pd
+import numpy as _np
 
 
 def scatter_indicators(dataframe: _pd.DataFrame,
@@ -78,8 +79,22 @@ def correlation_heatmap(dataframe: _pd.DataFrame,
         dataframe: dataframe to analyze
         indicators: indicators to analyze
     """
+    # add RUL columns to indicators to compute correlation
+    indicators.append('RUL')
     # compute correlation of specified columns and RUL
-    corr_matrix = dataframe.loc[:, indicators + ['RUL']].corr()
+    corr_matrix = dataframe.loc[:, indicators].corr()
+    # create mask to show only lower half of heatmap
+    mask = _np.zeros_like(corr_matrix)
+    mask[_np.triu_indices_from(mask, 1)] = 1
     # plot heatmap of correlation
     _plt.figure(figsize=(15, 15))
-    _sns.heatmap(corr_matrix, vmax=.8, annot=True, cmap="coolwarm", square=False)
+    _sns.heatmap(corr_matrix, vmax=.8, annot=True, mask=mask, cmap="coolwarm", square=False)
+    # print textual analysis
+    print('\nCorrelation insights')
+    for i, ind in enumerate(indicators):
+        for j in range(i):
+            corr_ij = corr_matrix.iloc[i, j]
+            if corr_ij > .8:
+                print(f'* {ind} is strongly positively correlated with {indicators[j]} = %.2f' % corr_ij)
+            elif corr_ij < -.8:
+                print(f'* {ind} is strongly negatively correlated with {indicators[j]} = %.2f' % corr_ij)
