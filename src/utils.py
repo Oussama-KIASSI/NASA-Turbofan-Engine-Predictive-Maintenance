@@ -68,6 +68,7 @@ def save_data(dataframes: dict[str, _pd.DataFrame],
         file_path = _os.path.join(source_path, data_type, k + '.csv')
         # save data to path in csv format
         dataframes[k].to_csv(file_path, index=False)
+    print('Saving successful')
 
 
 def save_scaler(scaler: object,
