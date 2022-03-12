@@ -36,13 +36,15 @@ def load_data(data_prefix: str,
         # process only files with specified extension
         if file.endswith(data_ext):
             file_path = _os.path.join(data_path, file)
-            file_name = _re.sub(data_ext, '', file)
+            file_name = _re.sub(pattern=data_ext, repl='', string=file)
             # load first type dataset
             if file.startswith(data_prefix):
-                dataframes[file_name] = _pd.read_csv(file_path, sep=sep, names=data_schema, usecols=data_schema)
+                dataframes[file_name] = _pd.read_csv(filepath_or_buffer=file_path, sep=sep, names=data_schema,
+                                                     usecols=data_schema)
             # load other type dataset
             else:
-                dataframes[file_name] = _pd.read_csv(file_path, sep=sep, names=data_schema_, usecols=data_schema_)
+                dataframes[file_name] = _pd.read_csv(filepath_or_buffer=file_path, sep=sep, names=data_schema_,
+                                                     usecols=data_schema_)
             df_shape = dataframes[file_name].shape
             # info about loaded dataset
             print('\n' + '-' * 30 + '\n' + file_name.center(30, '-') + '\n' + '-' * 30)
@@ -67,46 +69,51 @@ def save_data(dataframes: dict[str, _pd.DataFrame],
         # path where data will be stored
         file_path = _os.path.join(source_path, data_type, k + '.csv')
         # save data to path in csv format
-        dataframes[k].to_csv(file_path, index=False)
+        dataframes[k].to_csv(path_or_buf=file_path, index=False)
     print('Saving successful')
 
 
 def save_scaler(scaler: object,
+                tag: str,
                 scaler_store_path: str = '../models/02_scalers',
-                scaler_type: str = 'MinMax'):
+                scaler_type: str = 'Robust'):
     """save scaler in the specified path
 
     Args:
         scaler: scaler to save
         scaler_store_path: scaler store folder
         scaler_type: scaler type/name
+        tag: tag to associate with scaler
     """
     # path where scaler will be stored
-    file_path = _os.path.join(scaler_store_path, scaler_type + 'Scaler.pkl')
+    file_path = _os.path.join(scaler_store_path, scaler_type + tag + 'Scaler.pkl')
     # save scaler as binary object
     with open(file_path, 'wb') as f:
-        _pkl.dump(scaler, f)
+        _pkl.dump(obj=scaler, file=f)
 
 
-def load_scaler(scaler_store_path: str = '../models/02_scalers',
-                scaler_type: str = 'MinMax'):
+def load_scaler(tag: str,
+                scaler_store_path: str = '../models/02_scalers',
+                scaler_type: str = 'Robust') -> object:
     """return scaler from specified path
 
     Args:
         scaler_store_path: scaler store folder
         scaler_type: scaler type/name
+        tag: tag of scaler
 
     Returns:
-        scaler
+        scaler object
     """
     # path of scaler
-    file_path = _os.path.join(scaler_store_path, scaler_type + 'Scaler.pkl')
+    file_path = _os.path.join(scaler_store_path, scaler_type + tag + 'Scaler.pkl')
     # read scaler as binary object
     with open(file_path, 'rb') as f:
-        return _pkl.load(f)
+        return _pkl.load(file=f)
 
 
 def save_model(model: object,
+               tag: str,
                model_store_path: str = '../models/01_baseline',
                model_type: str = 'LinReg'):
     """save model to specified path
@@ -115,27 +122,30 @@ def save_model(model: object,
         model: model to save
         model_store_path: model store folder
         model_type: model type/name
+        tag: tag to associate with model
     """
     # path where model will be stored
-    file_path = _os.path.join(model_store_path, model_type + '.pkl')
+    file_path = _os.path.join(model_store_path, model_type + tag + '.pkl')
     # save model as binary object
     with open(file_path, 'wb') as f:
-        _pkl.dump(model, f)
+        _pkl.dump(obj=model, file=f)
 
 
-def load_model(model_store_path: str = '../models/01_baseline',
-               model_type: str = 'LinReg'):
+def load_model(tag: str,
+               model_store_path: str = '../models/01_baseline',
+               model_type: str = 'LinReg') -> object:
     """return model from specified path
 
     Args:
         model_store_path: model store folder
         model_type: model type/name
+        tag: tag of model
 
     Returns:
-        model
+        model object
     """
     # path of model
-    file_path = _os.path.join(model_store_path, model_type + '.pkl')
+    file_path = _os.path.join(model_store_path, model_type + tag + '.pkl')
     # read model as binary object
     with open(file_path, 'rb') as f:
-        return _pkl.load(f)
+        return _pkl.load(file=f)

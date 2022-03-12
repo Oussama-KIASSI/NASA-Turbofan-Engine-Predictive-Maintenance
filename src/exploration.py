@@ -23,7 +23,7 @@ def missing_values(dataframes: dict[str, _pd.DataFrame]) -> dict[str, _pd.DataFr
         # count percentage of missing values in dataframe
         mis_val_percent = 100 * dataframes[k].isnull().sum() / df_shape[0]
         # concatenate count and percentage
-        mis_val_table = _pd.concat([mis_val, mis_val_percent], axis=1)
+        mis_val_table = _pd.concat(objs=[mis_val, mis_val_percent], axis=1)
         # rename columns
         mis_val_table_ren_columns = mis_val_table.rename(
             columns={0: 'Missing Values', 1: '% of Total Values'})
