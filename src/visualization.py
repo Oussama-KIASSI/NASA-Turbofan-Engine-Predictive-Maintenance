@@ -53,7 +53,7 @@ def displot_indicators(dataframe: _pd.DataFrame,
     # iterate over indicators
     for i, indicator in enumerate(indicators):
         # plot scatter plot of each indicator
-        _sns.histplot(data=dataframe, ax=axes[i], x=indicator, kde=True, color='darkred')
+        _sns.histplot(data=dataframe, ax=axes[i], x=indicator, kde=False, color='darkred')
 
 
 def line_indicators(dataframe: _pd.DataFrame,
