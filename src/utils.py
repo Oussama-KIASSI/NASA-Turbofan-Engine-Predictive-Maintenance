@@ -74,7 +74,6 @@ def save_data(dataframes: dict[str, _pd.DataFrame],
 
 
 def save_scaler(scaler: object,
-                tag: str,
                 scaler_store_path: str = '../models/02_scalers',
                 scaler_type: str = 'Robust'):
     """save scaler in the specified path
@@ -83,30 +82,27 @@ def save_scaler(scaler: object,
         scaler: scaler to save
         scaler_store_path: scaler store folder
         scaler_type: scaler type/name
-        tag: tag to associate with scaler
     """
     # path where scaler will be stored
-    file_path = _os.path.join(scaler_store_path, scaler_type + tag + 'Scaler.pkl')
+    file_path = _os.path.join(scaler_store_path, scaler_type + 'Scaler.pkl')
     # save scaler as binary object
     with open(file_path, 'wb') as f:
         _pkl.dump(obj=scaler, file=f)
 
 
-def load_scaler(tag: str,
-                scaler_store_path: str = '../models/02_scalers',
+def load_scaler(scaler_store_path: str = '../models/02_scalers',
                 scaler_type: str = 'Robust') -> object:
     """return scaler from specified path
 
     Args:
         scaler_store_path: scaler store folder
         scaler_type: scaler type/name
-        tag: tag of scaler
 
     Returns:
         scaler object
     """
     # path of scaler
-    file_path = _os.path.join(scaler_store_path, scaler_type + tag + 'Scaler.pkl')
+    file_path = _os.path.join(scaler_store_path, scaler_type + 'Scaler.pkl')
     # read scaler as binary object
     with open(file_path, 'rb') as f:
         return _pkl.load(file=f)

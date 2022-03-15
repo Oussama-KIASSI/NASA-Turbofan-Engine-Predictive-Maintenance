@@ -1,6 +1,5 @@
 import pandas as _pd
 import tqdm.notebook as _tqdm
-from sklearn.preprocessing import RobustScaler as _RobustScaler
 import numpy as _np
 import utils as _utils
 
@@ -117,39 +116,30 @@ def feature_extraction(dataframe: _pd.DataFrame,
     return dataframe_final
 
 
-def feature_scaling(dataframe_train: _pd.DataFrame,
-                    dataframe_test: _pd.DataFrame,
-                    tag: str) -> tuple[_pd.DataFrame, _pd.DataFrame]:
+def feature_scaling(dataframe: _pd.DataFrame,
+                    scaler_store_path: str = '../models/02_scalers',
+                    scaler_type: str = 'Robust'
+                    ) -> _pd.DataFrame:
     """scale data
 
     Args:
-        dataframe_train: train dataframe
-        dataframe_test: test dataframe
-        tag: tag to associate with scaler
+        dataframe: dataframe to scale
+        scaler_store_path: scaler store folder
+        scaler_type: scaler type/name
 
     Returns:
-        tuple of scaled dataframe
+        scaled dataframe
     """
     # get columns' names
-    columns = dataframe_train.columns[1:]
-    # get input variables from dataframe_train
-    X_train = dataframe_train.drop(columns=['Engine_no', 'RUL']).values
-    # get target variable from dataframe_train
-    y_train = dataframe_train.loc[:, 'RUL'].values
-    # get input variables from dataframe_test
-    X_test = dataframe_test.drop(columns=['Engine_no', 'RUL']).values
-    # get target variable from dataframe_test
-    y_test = dataframe_test.loc[:, 'RUL'].values
-    # initialize robust scaler object
-    Scaler = _RobustScaler()
+    columns = dataframe.columns[1:]
+    # get input variables from dataframe
+    X = dataframe.loc[:, ~dataframe.columns.isin(['Engine_no', 'RUL'])].values
+    # get target variable from dataframe
+    y = dataframe.loc[:, 'RUL'].values
+    # initialize scaler object
+    scaler = _utils.load_scaler(scaler_store_path, scaler_type)
     # fit scaler and transform X_train data
-    X_train = Scaler.fit_transform(X=X_train, y=y_train)
-    # transform X_test data
-    X_test = Scaler.transform(X=X_test)
+    X = scaler.transform(X=X)
     # create scaled train dataframe
-    dataframe_train_scaled = _pd.DataFrame(data=_np.hstack((X_train, y_train[:, None])), columns=columns)
-    # create scaled test dataframe
-    dataframe_test_scaled = _pd.DataFrame(data=_np.hstack((X_test, y_test[:, None])), columns=columns)
-    # save scaler
-    _utils.save_scaler(scaler=Scaler, tag=tag)
-    return dataframe_train_scaled, dataframe_test_scaled
+    dataframe_scaled = _pd.DataFrame(data=_np.hstack((X, y[:, None])), columns=columns)
+    return dataframe_scaled
